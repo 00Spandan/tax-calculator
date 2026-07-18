@@ -1,5 +1,5 @@
-project_id                      = "financial-tools"
+project_id                      = "financial-tools-502613"
 region                          = "australia-southeast1"
-artifact_registry_repository_id = "tax-calculator"
-cloud_run_service_name          = "tax-calculator-frontend"
+artifact_registry_repository_id = "financial-tools"
+cloud_run_service_name          = "tax-calculator"
 container_image                 = "australia-southeast1-docker.pkg.dev/financial-tools/tax-calculator/tax-calculator:latest"

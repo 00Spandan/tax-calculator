@@ -14,7 +14,7 @@ resource "google_artifact_registry_repository" "frontend" {
   project       = var.project_id
   location      = var.region
   repository_id = var.artifact_registry_repository_id
-  description   = "Docker repository for Tax Calculator frontend"
+  description   = "Docker repository for Financial Tools"
   format        = "DOCKER"
 
   depends_on = [google_project_service.artifact_registry]
@@ -43,9 +43,9 @@ resource "google_cloud_run_v2_service" "frontend" {
 }
 
 resource "google_cloud_run_v2_service_iam_member" "public_invoker" {
+  name     = var.cloud_run_service_name
   project  = var.project_id
   location = var.region
-  service  = google_cloud_run_v2_service.frontend.name
   role     = "roles/run.invoker"
   member   = "allUsers"
 }
