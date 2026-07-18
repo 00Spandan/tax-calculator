@@ -43,10 +43,26 @@ Then open `http://localhost:8080`.
 
 ```bash
 cd terraform
-cp terraform.tfvars.example terraform.tfvars
+cp terraform.tfvars
 terraform init
 terraform plan
 terraform apply
+```
+
+## gcloud usage
+
+```bash
+gcloud init
+gcloud auth login
+gcloud auth application-default login
+```
+## Create Service Account Key
+
+```bash
+export GOOGLE_CLOUD_PROJECT=financial-tools-502613
+gcloud iam service-accounts keys create ~/terraform-key.json \
+  --iam-account=terraform-service-account@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com
+export GOOGLE_APPLICATION_CREDENTIALS="/home/node/terraform-key.json"
 ```
 
 ## Manual Cloud Run deployment flow
