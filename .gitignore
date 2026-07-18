@@ -137,8 +137,8 @@ dist
 !.yarn/sdks
 !.yarn/versions
 
-# github
-.github
+# github dependabot
+.github/dependabot.yml
 
 # terraform
 *.tfstate
