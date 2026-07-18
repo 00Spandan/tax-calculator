@@ -55,6 +55,8 @@ terraform apply
 gcloud init
 gcloud auth login
 gcloud auth application-default login
+export GOOGLE_CLOUD_PROJECT=financial-tools-502613
+gcloud config set project $GOOGLE_CLOUD_PROJECT
 ```
 ## Create Service Account Key
 
