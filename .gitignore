@@ -140,6 +140,21 @@ dist
 # github
 .github
 
+# terraform
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl 
+**/.terraform/*
+*.auto.tfvars
+*.tfoverride
+.terraformrc
+terraform.rc
+
+# Environment variables
+.envrc
+
 # Vite files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
