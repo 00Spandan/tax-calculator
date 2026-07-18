@@ -18,7 +18,7 @@ Starter project for deploying a Vite + React frontend to Google Cloud Run with T
     ├── main.tf
     ├── outputs.tf
     ├── providers.tf
-    ├── terraform.tfvars.example
+    ├── terraform.tfvars
     ├── variables.tf
     └── versions.tf
 ```
@@ -71,12 +71,12 @@ export GOOGLE_APPLICATION_CREDENTIALS="/home/node/terraform-key.json"
 
    ```bash
    gcloud auth configure-docker australia-southeast1-docker.pkg.dev
-   docker build -t australia-southeast1-docker.pkg.dev/financial-tools/tax-calculator/tax-calculator:latest .
-   docker push australia-southeast1-docker.pkg.dev/financial-tools/tax-calculator/tax-calculator:latest
+   docker build -t australia-southeast1-docker.pkg.dev/financial-tools-502613/financial-tools/tax-calculator:latest .
+   docker push australia-southeast1-docker.pkg.dev/financial-tools-502613/financial-tools/tax-calculator:latest
    ```
 
 2. Ensure `terraform/terraform.tfvars` has:
-   - `project_id = "financial-tools"`
+   - `project_id = "financial-tools-502613"`
    - `region = "australia-southeast1"`
    - `container_image` matching the pushed image URI.
 
