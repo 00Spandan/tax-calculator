@@ -155,9 +155,6 @@ terraform.rc
 # Environment variables
 .envrc
 
-# package-lock.json
-package-lock.json
-
 # Vite files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
