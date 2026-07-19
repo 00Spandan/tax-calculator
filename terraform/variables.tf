@@ -12,13 +12,13 @@ variable "region" {
 variable "artifact_registry_repository_id" {
   description = "Artifact Registry repository ID for Docker images"
   type        = string
-  default     = "tax-calculator"
+  default     = "financial-tools"
 }
 
 variable "cloud_run_service_name" {
   description = "Cloud Run service name"
   type        = string
-  default     = "tax-calculator-frontend"
+  default     = "tax-calculator"
 }
 
 variable "container_image" {

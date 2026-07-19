@@ -1,6 +1,7 @@
 # tax-calculator
-
-Starter project for deploying a Vite + React frontend to Google Cloud Run with Terraform.
+```text
+External IP: https://tax-calculator-fxmrz6v4xq-ts.a.run.app/
+```
 
 ## Project structure
 
@@ -18,7 +19,7 @@ Starter project for deploying a Vite + React frontend to Google Cloud Run with T
     ├── main.tf
     ├── outputs.tf
     ├── providers.tf
-    ├── terraform.tfvars.example
+    ├── terraform.tfvars
     ├── variables.tf
     └── versions.tf
 ```
@@ -43,36 +44,70 @@ Then open `http://localhost:8080`.
 
 ```bash
 cd terraform
-cp terraform.tfvars.example terraform.tfvars
+cp terraform.tfvars
 terraform init
 terraform plan
 terraform apply
 ```
 
+## gcloud usage
+
+```bash
+gcloud init
+gcloud auth login
+gcloud auth application-default login
+export GOOGLE_CLOUD_PROJECT=financial-tools-502613
+gcloud config set project $GOOGLE_CLOUD_PROJECT
+```
+## Create Service Account Key
+
+```bash
+export GOOGLE_CLOUD_PROJECT=financial-tools-502613
+gcloud iam service-accounts keys create ~/terraform-key.json \
+  --iam-account=terraform-service-account@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com
+export GOOGLE_APPLICATION_CREDENTIALS="/home/node/terraform-key.json"
+```
+## Merging to main
+
+```text
+Once a PR is merged into main, the GitHub Actions workflow (.github/workflows/deploy.yml) runs automatically — build, push (tagged by commit SHA), and terraform apply — and the change goes live at the external IP without any manual steps.
+```
+
 ## Manual Cloud Run deployment flow
 
-1. Build and push the image to Artifact Registry:
+1. Authenticate Docker with Artifact Registry (one-time setup per environment):
 
-   ```bash
+```bash
    gcloud auth configure-docker australia-southeast1-docker.pkg.dev
-   docker build -t australia-southeast1-docker.pkg.dev/financial-tools/tax-calculator/tax-calculator:latest .
-   docker push australia-southeast1-docker.pkg.dev/financial-tools/tax-calculator/tax-calculator:latest
-   ```
+```
 
-2. Ensure `terraform/terraform.tfvars` has:
-   - `project_id = "financial-tools"`
+2. Build and push the image:
+
+```bash
+   npm run gcp:deploy
+```
+
+   This runs `gcp:build` and `gcp:push` in sequence. Equivalent raw commands:
+
+```bash
+   docker build -t australia-southeast1-docker.pkg.dev/financial-tools-502613/financial-tools/tax-calculator:latest .
+   docker push australia-southeast1-docker.pkg.dev/financial-tools-502613/financial-tools/tax-calculator:latest
+```
+
+3. Ensure `terraform/terraform.tfvars` has:
+   - `project_id = "financial-tools-502613"`
    - `region = "australia-southeast1"`
    - `container_image` matching the pushed image URI.
 
-3. Apply Terraform:
+4. Apply Terraform:
 
-   ```bash
+```bash
    cd terraform
    terraform apply
-   ```
+```
 
-4. Retrieve the deployed URL:
+5. Retrieve the deployed URL:
 
-   ```bash
+```bash
    terraform output cloud_run_url
-   ```
+```

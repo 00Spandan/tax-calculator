@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "gcp:build": "docker build -t australia-southeast1-docker.pkg.dev/financial-tools-502613/financial-tools/tax-calculator:latest .",
+    "gcp:push": "docker push australia-southeast1-docker.pkg.dev/financial-tools-502613/financial-tools/tax-calculator:latest",
+    "gcp:deploy": "npm run gcp:build && npm run gcp:push"
   },
   "dependencies": {
     "react": "^19.2.0",

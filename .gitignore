@@ -137,6 +137,27 @@ dist
 !.yarn/sdks
 !.yarn/versions
 
+# github dependabot
+.github/dependabot.yml
+
+# terraform
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl 
+**/.terraform/*
+*.auto.tfvars
+*.tfoverride
+.terraformrc
+terraform.rc
+
+# Environment variables
+.envrc
+
+# package-lock.json
+package-lock.json
+
 # Vite files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
