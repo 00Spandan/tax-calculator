@@ -3,6 +3,33 @@
 External IP: https://tax-calculator-fxmrz6v4xq-ts.a.run.app/
 ```
 
+## Tech stack
+
+AI
+```text
+Claude Code, CoPilot Agent, Claude, GhatGPT
+```
+
+CI/CD
+```text
+Terraform, GitHub Actions, Docker
+```
+
+Cloud
+```text
+Cloud Run, Cloud Storage, gcloud CLI
+```
+
+WebApp
+```text
+Node.js, TypeScript, React (Vite), Hooks, UI Framework, Zod
+```
+
+Business Logic
+```text
+Government Tax API, Researched personal knowledge
+```
+
 ## Project structure
 
 ```text
