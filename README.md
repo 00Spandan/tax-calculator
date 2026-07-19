@@ -111,3 +111,10 @@ Once a PR is merged into main, the GitHub Actions workflow (.github/workflows/de
 ```bash
    terraform output cloud_run_url
 ```
+
+## GCS Terraform state bucket versioning
+
+Terraform state is stored in `financial-tools-502613-tfstate`, which has
+versioning enabled, with a lifecycle rule keeping the 10 most recent
+noncurrent state versions (applied via `gcloud storage buckets update
+--lifecycle-file=...`, not tracked in repo).
