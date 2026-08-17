@@ -1,119 +1,157 @@
-# tax-calculator
-External IP: https://tax-calculator-fxmrz6v4xq-ts.a.run.app/
+# financial-tools
 
-## Tech stack
+Financial Tools is a cloud-native application with a React frontend, a Go BFF, and a Go tax-calculator microservice.
 
-AI
-```text
-Claude Code, CoPilot Agent, Claude, GhatGPT
+## Architecture
+
+```mermaid
+flowchart TD
+    A[Browser\nReact + TypeScript Frontend\nfinancial-tools-frontend] -->|HTTPS/JSON| B[Go BFF\nfinancial-tools-bff]
+    B -->|gRPC| C[Go Tax Calculator Service\ntax-calculator]
 ```
 
-CI/CD
+### Why the BFF exists
+
+The BFF provides a stable frontend-facing JSON API and isolates browser concerns (request validation, HTTP errors, payload shaping) from backend service contracts. The tax-calculator service stays focused on tax domain logic and gRPC contracts.
+
+## Repository structure
+
 ```text
-Terraform, GitHub Actions, Docker
+frontend/                    # React + TypeScript + Vite frontend
+services/
+  bff/                       # Go HTTP BFF that calls tax-calculator via gRPC
+  tax-calculator/            # Go gRPC tax domain service
+proto/
+  tax/tax.proto              # Protobuf contract
+gen/
+  go/                        # Generated Go protobuf/grpc code
+  typescript/                # Generated TypeScript protobuf types
+terraform/                   # GCP infrastructure (Cloud Run, Artifact Registry)
+.github/workflows/           # Service-specific CI/CD + Terraform workflow
+docker-compose.yml           # Local full-stack development
 ```
 
-Cloud
-```text
-Cloud Run, Cloud Storage, gcloud CLI
-```
+## Services
 
-WebApp
-```text
-Node.js, TypeScript, React (Vite), Hooks, UI Framework, Zod
-```
+### Frontend (`financial-tools-frontend`)
+- React + TypeScript + Vite
+- Calls BFF via `/api/tax/calculate`
+- No business tax logic in UI
 
-Business Logic
-```text
-Government Tax API, Researched personal knowledge
-```
+### BFF (`financial-tools-bff`)
+- Go HTTP server
+- Endpoint: `POST /api/tax/calculate`
+- Validates request shape and proxies to tax-calculator via gRPC
+- Maps gRPC errors to HTTP status codes
+- No tax business logic
 
-## Run React app locally
+### Tax calculator (`tax-calculator`)
+- Go gRPC service
+- Owns tax calculation domain logic
+- Transport handlers delegate to internal domain package
+
+## Protobuf and gRPC
+
+Contract file:
+- `proto/tax/tax.proto`
+
+Generate code:
 
 ```bash
+cd frontend && npm install && cd ..
+sudo apt-get install -y protobuf-compiler
+scripts/generate-proto.sh
+```
+
+Generated outputs:
+- Go: `gen/go/tax/*.go`
+- TypeScript: `gen/typescript/tax.ts`
+
+Do not edit generated files manually.
+
+## Local development
+
+### Option 1: run each service directly
+
+```bash
+# terminal 1
+cd services/tax-calculator
+go run ./cmd/server
+
+# terminal 2
+cd services/bff
+TAX_CALCULATOR_GRPC_TARGET=localhost:8080 go run ./cmd/server
+
+# terminal 3
+cd frontend
 npm install
 npm run dev
 ```
 
-## Build and run with Docker
+Frontend dev server: http://localhost:5173
+
+### Option 2: Docker Compose
 
 ```bash
-docker build -t tax-calculator:local .
-docker run --rm -p 8080:8080 tax-calculator:local
+docker compose up --build
 ```
 
-Then open http://localhost:8080
+Frontend: http://localhost:8080
 
-## Terraform usage
+## Docker
+
+- `frontend/Dockerfile`
+- `services/bff/Dockerfile`
+- `services/tax-calculator/Dockerfile`
+
+All containers listen on the Cloud Run `PORT` environment variable.
+
+## Terraform / GCP infrastructure
+
+Terraform continues using the existing GCS remote backend in `terraform/versions.tf`.
+
+Managed resources include:
+- Artifact Registry repository (`financial-tools`)
+- Cloud Run services:
+  - `financial-tools-frontend`
+  - `financial-tools-bff`
+  - `tax-calculator`
+
+Run locally:
 
 ```bash
 cd terraform
-cp terraform.tfvars
 terraform init
 terraform plan
 terraform apply
 ```
 
-## gcloud usage
+## Artifact Registry image naming
 
-```bash
-gcloud init
-gcloud auth login
-gcloud auth application-default login
-export GOOGLE_CLOUD_PROJECT=financial-tools-502613
-gcloud config set project $GOOGLE_CLOUD_PROJECT
-```
-## Create Service Account Key
+Images are pushed under repository `financial-tools` with image names:
+- `financial-tools-frontend`
+- `financial-tools-bff`
+- `tax-calculator`
 
-```bash
-export GOOGLE_CLOUD_PROJECT=financial-tools-502613
-gcloud iam service-accounts keys create ~/terraform-key.json \
-  --iam-account=terraform-service-account@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com
-export GOOGLE_APPLICATION_CREDENTIALS="/home/node/terraform-key.json"
-```
-## Merging to main
+## GitHub Actions workflows
 
-```text
-Once a PR is merged into main, the GitHub Actions workflow (.github/workflows/deploy.yml) runs automatically — build, push (tagged by commit SHA), and terraform apply — and the change goes live at the external IP without any manual steps.
-```
+- `frontend.yml` – test/build/deploy frontend
+- `bff.yml` – generate proto, test/build/deploy BFF
+- `tax-calculator.yml` – generate proto, test/build/deploy tax service
+- `terraform.yml` – fmt/validate/plan/apply Terraform on Terraform changes
 
-## Manual Cloud Run deployment flow
+Path filters are used so unrelated services are not rebuilt unnecessarily.
 
-1. Authenticate Docker with Artifact Registry (one-time setup per environment):
+## Deployment process
 
-```bash
-   gcloud auth configure-docker australia-southeast1-docker.pkg.dev
-```
+1. Push service changes to `main`.
+2. Service workflow builds + pushes image and deploys its Cloud Run service.
+3. Terraform workflow runs when infrastructure code changes.
 
-2. Build and push the image:
+## Environment and secrets
 
-```bash
-   npm run gcp:deploy
-```
+GitHub Actions requires:
+- `GCP_WORKLOAD_IDENTITY_PROVIDER`
+- `GCP_SERVICE_ACCOUNT`
 
-   This runs `gcp:build` and `gcp:push` in sequence. Equivalent raw commands:
-
-```bash
-   docker build -t australia-southeast1-docker.pkg.dev/financial-tools-502613/financial-tools/tax-calculator:latest .
-   docker push australia-southeast1-docker.pkg.dev/financial-tools-502613/financial-tools/tax-calculator:latest
-```
-
-3. Apply Terraform:
-
-```bash
-   cd terraform
-   terraform apply
-```
-
-4. Retrieve the deployed URL:
-
-```bash
-   terraform output cloud_run_url
-```
-
-## GCS Terraform state bucket versioning
-
-Terraform state is stored in `financial-tools-502613-tfstate`, which has
-versioning enabled, with a lifecycle rule keeping the 10 most recent
-noncurrent state versions (applied via `gcloud storage buckets update
---lifecycle-file=...`, not tracked in repo).
+Terraform variables are defined in `terraform/variables.tf` and currently set in `terraform/terraform.tfvars`.

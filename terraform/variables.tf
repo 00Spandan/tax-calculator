@@ -15,13 +15,35 @@ variable "artifact_registry_repository_id" {
   default     = "financial-tools"
 }
 
-variable "cloud_run_service_name" {
-  description = "Cloud Run service name"
+variable "frontend_service_name" {
+  description = "Cloud Run frontend service name"
+  type        = string
+  default     = "financial-tools-frontend"
+}
+
+variable "bff_service_name" {
+  description = "Cloud Run BFF service name"
+  type        = string
+  default     = "financial-tools-bff"
+}
+
+variable "tax_calculator_service_name" {
+  description = "Cloud Run tax calculator service name"
   type        = string
   default     = "tax-calculator"
 }
 
-variable "container_image" {
-  description = "Container image URI to deploy to Cloud Run"
+variable "frontend_container_image" {
+  description = "Container image URI for frontend"
+  type        = string
+}
+
+variable "bff_container_image" {
+  description = "Container image URI for BFF"
+  type        = string
+}
+
+variable "tax_calculator_container_image" {
+  description = "Container image URI for tax calculator"
   type        = string
 }

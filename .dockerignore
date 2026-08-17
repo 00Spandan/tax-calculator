@@ -1,7 +1,7 @@
-node_modules
-dist
 .git
 .gitignore
-README.md
+**/node_modules
+**/dist
+**/.DS_Store
 terraform/.terraform
 terraform/.terraform.lock.hcl

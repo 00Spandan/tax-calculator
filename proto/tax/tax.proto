@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package tax.v1;
+
+option go_package = "github.com/00Spandan/financial-tools/gen/go/tax/v1;taxv1";
+
+service TaxCalculator {
+  rpc CalculateTax(CalculateTaxRequest) returns (CalculateTaxResponse);
+}
+
+message CalculateTaxRequest {
+  double annual_income = 1;
+  string tax_year = 2;
+  string country_code = 3;
+}
+
+message CalculateTaxResponse {
+  double taxable_income = 1;
+  double tax_owed = 2;
+  double effective_tax_rate = 3;
+}
