@@ -1,7 +1,5 @@
 # tax-calculator
-```text
 External IP: https://tax-calculator-fxmrz6v4xq-ts.a.run.app/
-```
 
 ## Tech stack
 
@@ -30,27 +28,6 @@ Business Logic
 Government Tax API, Researched personal knowledge
 ```
 
-## Project structure
-
-```text
-.
-├── Dockerfile
-├── nginx.conf
-├── package.json
-├── index.html
-├── src/
-│   ├── App.css
-│   ├── App.jsx
-│   └── main.jsx
-└── terraform/
-    ├── main.tf
-    ├── outputs.tf
-    ├── providers.tf
-    ├── terraform.tfvars
-    ├── variables.tf
-    └── versions.tf
-```
-
 ## Run React app locally
 
 ```bash
@@ -65,7 +42,7 @@ docker build -t tax-calculator:local .
 docker run --rm -p 8080:8080 tax-calculator:local
 ```
 
-Then open `http://localhost:8080`.
+Then open http://localhost:8080
 
 ## Terraform usage
 
@@ -121,19 +98,14 @@ Once a PR is merged into main, the GitHub Actions workflow (.github/workflows/de
    docker push australia-southeast1-docker.pkg.dev/financial-tools-502613/financial-tools/tax-calculator:latest
 ```
 
-3. Ensure `terraform/terraform.tfvars` has:
-   - `project_id = "financial-tools-502613"`
-   - `region = "australia-southeast1"`
-   - `container_image` matching the pushed image URI.
-
-4. Apply Terraform:
+3. Apply Terraform:
 
 ```bash
    cd terraform
    terraform apply
 ```
 
-5. Retrieve the deployed URL:
+4. Retrieve the deployed URL:
 
 ```bash
    terraform output cloud_run_url
